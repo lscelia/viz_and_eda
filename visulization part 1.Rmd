@@ -61,3 +61,34 @@ weather_df %>%
   geom_smooth(se = FALSE)
 ```
 
+
+## use data manipulation as part of this
+```{r}
+weather_df %>% 
+  filter(name == "CentralPark_NY") %>% 
+  mutate(
+    tmax_fahr = tmax * (9 / 5) + 32,
+    tmin_fahr = tmin * (9 / 5) + 32
+    ) %>% 
+  ggplot(aes(x = date, y = tmax)) + 
+  geom_point()
+```
+
+
+## Stcaking geoms
+
+
+which geoms do you want
+
+```{r}
+ggplot(weather_df, aes(x = date, y = tmax, color = name)) + 
+  geom_smooth(se = FALSE) 
+```
+
+
+hexagon plot
+```{r}
+ggplot(weather_df, aes(x = tmax, y = tmin)) + 
+  geom_hex()
+```
+
