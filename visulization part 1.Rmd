@@ -2,3 +2,62 @@
 title: "ggplot 1"
 output: html_document
 ---
+
+```{r, message = FALSE}
+library(tidyverse)
+library(ggridges)
+```
+
+
+Load a dataset that we'll use often
+
+```{r, message = FALSE}
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728", "USC00519397", "USS0023B17S"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2017-01-01",
+    date_max = "2017-12-31") %>%
+  mutate(
+    name = recode(
+      id, 
+      USW00094728 = "CentralPark_NY", 
+      USC00519397 = "Waikiki_HA",
+      USS0023B17S = "Waterhole_WA"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) %>%
+  select(name, id, everything())
+```
+
+
+## Scatterplot
+
+tmax vs tmin
+```{r,  message = FALSE}
+ggp_tmax_tmin = 
+  weather_df %>%
+    ggplot(aes(x = tmin, y = tmax)) +
+    geom_point()
+```
+
+
+
+#fancy the graph up
+
+```{r, message = FALSE}
+ggplot(weather_df, aes(x = tmin, y = tmax, color = name)) + 
+  geom_point(alpha = .3) +
+  geom_smooth(se = FALSE) + 
+  facet_grid(. ~ name)
+```
+
+
+let's make one more scatterplot
+```{r, message = FALSE}
+weather_df %>% 
+  ggplot(aes(x = date, y = tmax, size = prcp)) + 
+  geom_point(alpha = .3) + 
+  facet_grid(. ~ name) + 
+  geom_smooth(se = FALSE)
+```
+
