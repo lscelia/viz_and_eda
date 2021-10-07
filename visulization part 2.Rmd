@@ -6,6 +6,7 @@ output: html_document
 ```{r, message = FALSE}
 library(tidyverse)
 library(ggridges)
+library(patchwork)
 
 #setting up the format of graph
 knitr::opts_chunk$set(
@@ -129,6 +130,46 @@ ggplot(data = waikiki, aes(x = date, y = tmax, color = name)) +
   geom_point() + 
   geom_line(data = central_park)
 ```
+
+
+## 'patchwork'
+
+```{r}
+ggp_tmax_tmin = 
+  weather_df %>% 
+  ggplot(aes(x = tmin, y  = tmax, color = name)) + 
+  geom_point(alpha = .3) + 
+  theme(legend.position = "none")
+
+ggp_prcp_dens = 
+  weather_df %>% 
+  filter(prcp > 0) %>% 
+  ggplot(aes(x = prcp, fill = name)) + 
+  geom_density(alpha = .3) + 
+  theme(legend.position = "none")
+
+
+gg_tmax_date = 
+  weather_df %>% 
+  ggplot(aes(x = date, y = tmax, color = name)) + 
+  geom_point(alpha = .5) +
+  geom_smooth(se = FALSE) + 
+  theme(legend.position = "bottom")
+  
+(ggp_tmax_tmin + ggp_prcp_dens) / gg_tmax_date
+```
+
+
+## data manipulation
+quick example on factors
+
+```{r}
+
+```
+
+
+
+
 
 
 
