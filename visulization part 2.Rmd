@@ -161,10 +161,53 @@ gg_tmax_date =
 
 
 ## data manipulation
+
 quick example on factors
 
 ```{r}
+weather_df %>% 
+  mutate(
+    name = fct_reorder(name, tmax) #useful if you have many plots
+  ) %>% 
+  ggplot(aes(x = name, y = tmax)) + 
+  geom_boxplot()
 
+```
+
+
+What about tmax and tmin...
+
+```{r}
+weather_df %>% 
+  pivot_longer(
+    tmax:tmin,
+    names_to = "obs",
+    values_to = "temperature"
+  ) %>% 
+  ggplot(aes(x = temperature, fill = obs)) + 
+  geom_density(alpha = .5) + 
+  facet_grid(~name)
+```
+
+
+
+```{r}
+pulse_df = 
+  haven::read_sas("./data/public_pulse_data.sas7bdat") %>%
+  janitor::clean_names() %>% 
+  pivot_longer(
+    bdi_score_bl:bdi_score_12m,
+    names_to = "visit", 
+    names_prefix = "bdi_score_",
+    values_to = "bdi"
+  ) %>%
+  mutate(
+    visit = recode(visit, "bl" = "00m"))
+
+pulse_df %>% 
+ggplot(aes(x = visit, y = bdi)) + 
+  geom_point(size = .2) + 
+  geom_line(aes(group = id))
 ```
 
 
