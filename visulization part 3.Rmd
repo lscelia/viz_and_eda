@@ -101,4 +101,64 @@ weather_df %>%
   knitr::kable(digits = 2)
 ```
 
+## grouped 'mutate'
+```{r}
+weather_df %>% 
+  group_by(name, month) %>% 
+  mutate(
+    mean_tmax = mean(tmax, na.rm = TRUE),
+    centered_tmax = tmax - mean_tmax
+  ) %>% #view
+    ggplot(aes(x = date, y = centered_tmax, color = name)) + geom_point()
+```
+
+
+```{r}
+weather_df %>% 
+  group_by(name) %>% 
+  mutate(
+    tmax_rank = min_rank(desc(tmax))
+  ) %>% 
+  filter(tmax_rank < 2)
+```
+
+
+Lagged variables
+(data on the previous days ==> for better comparison)
+```{r}
+weather_df %>% 
+  #to do lag, data better to be grouped
+  group_by(name) %>%
+  mutate(
+    lagged_tmax = lag(tmax, n = 1),
+    tmax_diff = tmax - lagged_tmax
+  ) %>% 
+  summarize(diff_sd = sd(tmax_diff, na.rm = TRUE))
+```
+
+
+## Limitations
+
+what if my "summary" is a linear model?
+
+DOESN'T work
+
+```{r}
+weather_df %>% 
+  group_by(name) %>% 
+  summarize(cor_tmin_tmax = cor(tmin, tmax, use = "complete"))
+
+weather_df %>% 
+  filter(name == "CentralPark_NY") %>% 
+  lm(tmax ~ tmin, data = .)
+
+# gives an error
+#weather_df %>% 
+  #group_by(name) %>% 
+  #summaize(lm = lm(tmax~tmin))
+```
+
+
+
+
 
