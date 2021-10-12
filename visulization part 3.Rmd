@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 Load a dataset that we'll use often
 
 ```{r, message = FALSE}
-weather_df = 
+weather_df =  
   rnoaa::meteo_pull_monitors(
     c("USW00094728", "USC00519397", "USS0023B17S"),
     var = c("PRCP", "TMIN", "TMAX"), 
@@ -33,8 +33,72 @@ weather_df =
       USC00519397 = "Waikiki_HA",
       USS0023B17S = "Waterhole_WA"),
     tmin = tmin / 10,
-    tmax = tmax / 10) %>%
+    tmax = tmax / 10,
+    month = lubridate::floor_date(date, unit = "month")) %>%
   select(name, id, everything())
+```
+
+## group_by
+```{r}
+weather_df %>%
+  group_by(name, month)
+```
+
+## count some things
+```{r}
+weather_df %>% 
+  group_by(month) %>% 
+  summarize(n_obs = n())
+
+
+#shortcut: q quick way to count
+weather_df %>% 
+  #cannot be used to find mean and SD
+  count(name)
+
+```
+
+
+## it is nice that this is a data frame
+
+'table' does not, and that's bad
+```{r}
+weather_df %>% 
+  pull(name) %>% 
+  table()
+```
+
+this gives a somewhat well-formatted table
+```{r}
+weather_df %>% 
+  janitor::tabyl(month, name)
+```
+
+
+## more general summaries
+lets' count, take means, look at SDs
+```{r}
+weather_df %>%  
+  group_by(name, month) %>% 
+  summarize(
+    n_obs = n(),
+    mean_tmax = mean(tmax, na.rm = TRUE),
+    median_tmax = median(tmax, na.rm = TRUE),
+    sd_tmax = sd(tmax, na.rm = TRUE)
+  ) %>% 
+  ggplot(aes(x = month, y = mean_tmax, color = name)) + geom_point() + geom_line()
+```
+
+```{r}
+weather_df %>%  
+  group_by(name, month) %>% 
+  summarize(
+    n_obs = n(),
+    mean_tmax = mean(tmax, na.rm = TRUE),
+    median_tmax = median(tmax, na.rm = TRUE),
+    sd_tmax = sd(tmax, na.rm = TRUE)
+  ) %>% 
+  knitr::kable(digits = 2)
 ```
 
 
